@@ -192,7 +192,7 @@
                     if (appAcc == "") {
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + url + ".plist\">" + url + "</a><br/>"
                     } else {
-                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + "/PlistInstall.ashx?" + queryString + "\">" + url + "</a><br/>"
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + "/PlistInstall.ashx" + queryString + "\">" + url + "</a><br/>"
                     }                
                 }
             }
@@ -358,16 +358,31 @@
                 // 測試站
                 switch (site) {
                     case "16":
-                        plist_k = "U9b6ikuyG9cFIojc";
+                        plist_k = "D869AB46BC91C065A91034551B842BDA";
                         break;
                     case "18":
-                        plist_k = "9raMjkdjnQntFgTW";
+                        plist_k = "A779652626F0FA7CBE9FFF1B22F9A795";
                         break;
                     case "19":
-                        plist_k = "XbEbV6edoSWokAgk";
+                        plist_k = "A4DD7F43E860C5A7F1E9B352687A4938";
                         break;
                     case "20":
                         plist_k = "5QZw5KHvbs9Nn2Za";
+                        break;
+                    case "21":
+                        plist_k = "32AD3597A3E87A106579938F58652FD8";
+                        break;
+                    case "2":
+                        plist_k = "9E5A5736B8834B79B10CA4CE7562F019";
+                        break;
+                    case "26":
+                        plist_k = "598DF6DFB9239FA27CAE4A086995C161";
+                        break;
+                    case "35":
+                        plist_k = "19C3085301FE244F9B1D3DB399E3D4B9";
+                        break;
+                    case "5":
+                        plist_k = "2C189894458F78493245F1CC6DDA68AD";
                         break;
                 }
             } else {
@@ -389,7 +404,7 @@
             }
 
             //取得da值
-            var plist_da = window.btoa("together00001@icloud.com.ipa")
+            var plist_da = window.btoa("together00001@icloud.com")
 
             return "?site="+site+"&k="+plist_k+"&da="+plist_da
         }
