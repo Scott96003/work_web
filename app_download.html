@@ -192,7 +192,9 @@
                     if (appAcc == "") {
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + url + ".plist\">" + url + "</a><br/>"
                     } else {
-                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + "/PlistInstall.ashx" + queryString + "\">" + url + "</a><br/>"
+                        //編碼後才可以放入
+                        var auto_plist_url = encodeURI("https://" + url + "/PlistInstall.ashx" + queryString);
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + url + "</a><br/>"
                     }                
                 }
             }
