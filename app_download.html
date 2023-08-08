@@ -170,18 +170,20 @@
             var version = document.getElementById("app_version").value;
             var typeObj = document.getElementById("app_type");
             var langObj = document.getElementById("app_site");
-            var appAcc = document.getElementById("appAccount").value;
+            var appAcc = document.getElementById("appAccount");
             var type = typeObj.value;
             var typeName = typeObj[typeObj.selectedIndex].text;
             var site = langObj.value;
             var siteName = langObj[langObj.selectedIndex].text;
+            var app_acc_id = appAcc.value;
+            var app_acc_text = appAcc[appAcc.selectedIndex].text;
 
             document.getElementById("download_list").innerHTML = "<span>請點選線路下載 " + siteName + " " + typeName + " 版本:" + version + "</span>";
 
             console.log("siteName:", site);
             var domains = getDomains(type, site, version)
             console.log("type:", type)
-            var queryString = plist_get_querystring(type,site,"together00001@icloud.com.ipa")
+            
 
             for (var x = 0; x < domains.length; x++) {
                 let path = domains[x].path
@@ -189,12 +191,14 @@
                 for (var y = 0; y < hosts.length; y++) {
                     let url = hosts[y]
 
-                    if (appAcc == "") {
+                    if (app_acc_id == "") {
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + url + ".plist\">" + url + "</a><br/>"
                     } else {
+                        //下載參數
+                        var queryString = plist_get_querystring(type,site,app_acc_id)
                         //編碼後才可以放入
                         var auto_plist_url = encodeURI("https://" + url + "/PlistInstall.ashx" + queryString);
-                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + url + "</a><br/>"
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + app_acc_text + "-" +url + "</a><br/>"
                     }                
                 }
             }
