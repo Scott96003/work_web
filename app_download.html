@@ -197,7 +197,7 @@
                         //下載參數
                         var queryString = plist_get_querystring(type,site,app_acc_id)
                         //編碼後才可以放入
-                        var auto_plist_url = encodeURI("https://" + url + "/PlistInstall.ashx" + queryString);
+                        var auto_plist_url = encodeURIComponent("https://" + url + "/PlistInstall.ashx" + queryString);
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + app_acc_text + "-" +url + "</a><br/>"
                     }                
                 }
