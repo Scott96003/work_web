@@ -121,12 +121,19 @@
             var type = getArgs("t");
             var site = getArgs("s");
             var time = getArgs("time");
+            var assign_acc_id = getArgs("aai"); //放入特定的憑證帳號
             console.log('參數接收的時間戳', time);
 
             document.getElementById("app_version").value = version || 1;
             document.getElementById("app_type").value = type || "dev";
             document.getElementById("app_site").value = site || "21";
-
+            if (assign_acc_id) {
+                document.getElementById("appAccount").value = "together00001@icloud.com";
+            } else {
+                document.getElementById("appAccount").value = "";
+            }
+            
+            
         }
 
         function getArgs(key) {
