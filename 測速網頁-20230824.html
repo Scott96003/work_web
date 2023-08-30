@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name=”viewport” content=”width=device-width, initial-scale=1.0″>
+
+<head>
+    <title>全站測速</title>
+</head>
+<style type="text/css">
+select {
+    width: 150px;
+    font-size: 18px;
+}
+
+textarea {
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+    height: 150px;
+    border: 1px solid #E1E100;
+    background: #F5FFFA;
+    overflow: auto;
+    resize: none;
+}
+
+option {
+    font-size: 18px;
+}
+
+button {
+    font-size: 18px;
+    border: 1px solid #E1E100;
+    background: #F5FFFA;
+}
+</style>
+
+<body>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/CryptoStore/crypto-js/3.1.2/build/rollups/tripledes.js"></script>
+    <h1>API測速 <span id='localIPtext'></span><button onclick="getLocalIP()">重新取得IP</button></h1>
+    <!-- 使用 id="user_name" -->
+    <div>
+        <font size="5">
+            站點
+            <select id="app_site" onchange="clic()">
+                <option value=16 selected>K 16站</option>
+                <option value=18>K 18站</option>
+                <option value=19>K 19站</option>
+                <option value=20>K 20站</option>
+                <option value=21>LEO 21站</option>
+                <option value=2>THA 2站</option>
+                <option value=26>BET9 26站</option>
+                <option value=35>BET8 35站</option>
+                <option value=5>THA 5站</option>
+            </select>
+            版本
+            <select id="app_type" onchange="clic()">
+                <option value="dev" selected>測試站</option>
+                <option value="uat">前測站</option>
+                <option value="release">正式站</option>
+            </select>
+        </font>
+    </div>
+    <br>
+    <!-- 連結內容 -->
+    <span>備用API取得 測速域名清單(只放兩條供測試)</span>
+    <div id="download_list">
+        <a href="javascript:void(0);" onclick="callBackApi('https://apiin.testtz886.net');">https://apiin.testtz886.net</a><br>
+        <a href="javascript:void(0);" onclick="callBackApi('https://apicd.testtz886.net');">https://apicd.testtz886.net</a>
+        <br>
+    </div>
+    <p>
+        <li>
+            <label for="text">回傳內容</label>
+    </p>
+    <table width="100%">
+        <tr>
+            <td>DomainList</td>
+            <td>API</td>
+            <td>WEB</td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="topText"></textarea>
+            </td>
+            <td>
+                <!-- 顯示API -->
+                <textarea id="ApiText"></textarea>
+            </td>
+            <td>
+                <!-- 顯示會員端線路 -->
+                <textarea id="WebText"></textarea>
+            </td>
+        </tr>
+    </table>
+    </li>
+    </p>
+    測速清單類型
+    <select id="app_domainType" onchange="changeTestList()">
+        <option value="kuapi" selected>KuAPI域名</option>
+        <option value="tsapi">TSAPI域名</option>
+        <option value="web">會員端域名</option>
+        <option value="rsBackapi">RS備用API域名</option>
+        <option value="downloadApi">APP下載域名</option>
+    </select>
+    <div id='domainList'>
+    </div>
+    <p>
+        帳號 <input type="text" value="sexy123" style='width:30%;' id="account"> 密碼 <input type="text" value="121212" style='width:30%;' id="password">
+    </p>
+    token <input type="text" value="" style='width:30%;' id="token">
+    <button id="login">登入</button> <label id="login_passtime" style="color:orange;"></label>
+    <hr>
+    <p>
+        線路選擇
+        <select id="apiDomain" name="apiDomain">
+            <option value="all">https://testmmapi.tz111.net</option>
+        </select>
+        路徑 <input type="text" value="/api/common/getCarousel" style='width:30%;' id="apiPath">
+        <p>
+            POST/GET
+            <select id="apiMethod" name="apiMethod">
+                <option value="get">GET</option>
+                <option value="post">POST</option>
+            </select>
+            <input type="button" id="myCheck" style='  box-sizing: content-box;
+     height: 300px;' value="請求API" onclick="callApi()">
+        </p>
+        <li>
+            <label for="text" style='width:40%;
+    display: inline-block;'>發送body</label> <label for="text" style='width:40%;
+    display: inline-block;'>回傳內容</label>
+    </p>
+    <textarea id="bodyJsonData" style='width:40%;' cols="50" rows="20"></textarea>
+    <textarea id="text" style='width:40%;' cols="50" rows="20"></textarea>
+    <p>
+    </p>
+    <p>
+        </li>
+    </p>
+</body>
+<script>
+// 開始請求登入時間
+var login_start_time;
+// 請求登入
+function callLoginApi() {
+
+    var account = document.getElementById("account").value;
+    var password = document.getElementById("password").value;
+    var encrypted = encryptByDES(password);
+
+
+    var dataJSON = {
+        "user": account,
+        "password": encrypted,
+        "device": "iphone_11_pro_max-66",
+        "loginType": "0"
+    };
+
+    // 取得站別
+    var site = document.getElementById("app_site").value;
+    // 取得域名類別
+    var domainType = document.getElementById("app_domainType").value;
+
+    var domain = $("#apiDomain :selected").text();
+    var responseJson;
+
+    var url = domain + "/api/member/login/v2";
+    showMsg(url + '\n請求中....')
+    $.ajax({
+        url: url,
+        crossDomain: true,
+        type: 'post',
+        dataType: "json",
+        data: JSON.stringify(dataJSON),
+        contentType: 'application/json',
+        headers: {
+            'TSSite': site,
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+        },
+        error: function(xhr) {
+            console.log(xhr);
+            alert('請求失敗');
+        },
+        success: function(response) {
+            responseJson = JSON.stringify(response, null, '\t')
+
+            showMsg(responseJson);
+
+            if (response.code == 0) {
+                document.getElementById("token").value = response.data.token;
+            } else {
+                document.getElementById("token").value = "";
+            }
+
+            var end_time = new Date().getTime(); // 結束時間
+            var pass_time = (end_time - login_start_time) + ' 毫秒';
+
+            var logigPasstime = document.getElementById('login_passtime');
+            logigPasstime.innerHTML = '請求登入耗時' + pass_time;
+        }
+    });
+}
+
+
+// 改變設定
+function clic() {
+
+    var appType = document.getElementById("app_type").value;
+
+    var content = '';
+    var list;
+
+    switch (appType) {
+        case 'dev':
+            list = ['https://apiin.testtz886.net', 'https://apicd.testtz886.net'];
+            break;
+        case 'uat':
+            list = ['https://uatapiin.tz886.net', 'https://uatapicd.tz886.net'];
+            break;
+        case 'release':
+            list = ["https://apiin.tz886.net", "https://apicd.tz886.net", "https://apisp.tz886.net", "https://apicf.tz886.net", "https://apitf.tz886.net", "https://apiws.tz886.net"];
+            break;
+    }
+
+
+    for (let [index, val] of list.entries()) {
+
+        content += '<a href="javascript:void(0);" onclick="callBackApi(' + "'" + val + "'" + ');">' + val + '</a><br>';
+    }
+
+
+    document.getElementById("download_list").innerHTML = content;
+
+}
+
+function printList() {
+    var list = ["https://mmapi777.iju888.net",
+        "https://mmapi777t.wa777.net",
+        "https://mmapia.jc99.net"
+    ]
+
+
+    $('.speedList')[0].innerHTML = "";
+    $("#apiDomain").empty();
+
+    var sel = document.getElementById('apiDomain');
+
+    for (let [index, val] of list.entries()) {
+
+        // 建立測速清單
+        var div = '第' + (index + 1) + '條測速線路：' + val + ' <div class="speed" data-url="' + val + '"></div>';
+        $('.speedList')[0].innerHTML += div;
+
+        // 添加請求選項
+        var opt = document.createElement('option');
+        opt.appendChild(document.createTextNode(val));
+        opt.value = 'option value';
+        sel.appendChild(opt);
+    }
+}
+
+// 設置測速列表
+function removeList() {
+
+}
+
+// 設置測速列表
+function setList(list) {
+
+    $('.speedList')[0].innerHTML = "";
+    $("#apiDomain").empty();
+
+    var sel = document.getElementById('apiDomain');
+
+    for (let [index, val] of list.entries()) {
+
+        // 建立測速清單
+        var div = '第' + (index + 1) + '條測速線路：' + val + ' <div class="speed" data-url="' + val + '"></div>';
+        $('.speedList')[0].innerHTML += div;
+
+        // 添加請求選項
+        var opt = document.createElement('option');
+        opt.appendChild(document.createTextNode(val));
+        opt.value = 'option value';
+        sel.appendChild(opt);
+    }
+
+    var description = document.getElementById('description');
+
+    var domainSel = document.getElementById("app_domainType");
+
+
+    var appTypeSel = document.getElementById("app_type");
+    var typeStr = appTypeSel.options[appTypeSel.selectedIndex].text;
+
+    description.innerHTML = "當前為 ”" + typeStr + "”" + " ”" + domainSel.options[domainSel.selectedIndex].text + "“ 測速清單";
+}
+
+// 改變測速清單
+function changeTestList() {
+    // 取得站別
+    var site = document.getElementById("app_site").value;
+    // 取得域名類別
+    var domainType = document.getElementById("app_domainType").value;
+
+    switch (domainType) {
+        case "tsapi":
+            if (domainJson.tzAPI) {
+                var apiList = domainJson.tzAPI.map(item => Object.values(item)[1]);
+                setList(apiList);
+            }
+            break;
+        case "kuapi":
+            if (domainJson.kuAPIv2) {
+                var apiList = domainJson.kuAPIv2.map(item => "https://" + Object.values(item));
+                setList(apiList);
+            }
+            break;
+        case "web":
+            switch (site) {
+                case '16': case '18': case '19': case '20':
+                    var list = domainJson.memberAPIv2.map(item => "https://" + Object.values(item));
+                    setList(list);
+                    break;
+                default:
+                    var list = domainJson.memberAPI.map(item => Object.values(item)[1]);
+                    setList(list);
+            }
+            break;
+        case "rsBackapi":
+            switch (site) {
+                case '16': case '18': case '19': case '20':
+                    var backAPIList = domainJson.backAPIv2.map(item => "https://" + Object.values(item));
+                    setList(backAPIList);
+                    break;
+                default:
+                    var backAPIList = domainJson.backAPI.map(item => Object.values(item)[1]);
+                    setList(backAPIList);
+            }
+
+            break;
+        case "downloadApi":
+            switch (site) {
+                case '16': case '18': case '19': case '20':
+                    var downAPIList = domainJson.downAPIv2.map(item => "https://" + Object.values(item));
+                    setList(downAPIList);
+                    break;
+                default:
+                    var downAPIList = domainJson.downAPI.map(item => Object.values(item)[1]);
+                    setList(downAPIList);
+            }
+            break;
+    }
+}
+var domainJson = {}
+// 請求備用API取得 urlList
+function callBackApi(url) {
+    createSpeedTestBox();
+    var responseJson;
+
+    var url = url + '/ajax/AjaxSrvAPI.aspx';
+    showTopTextMsg(url + ' 請求中....')
+
+    var dataJSON = {
+        "action": "urlList", // blacklist
+        "sn": "1",
+        "sendSN": "1",
+        "t": "20200520103931",
+    };
+
+    // 取得站別
+    var site = document.getElementById("app_site").value;
+
+    $.ajax({
+        url: url,
+        crossDomain: true,
+        type: 'post',
+        dataType: "json",
+        cache: false,
+        crossDomain: true,
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(dataJSON),
+        headers: {
+            "DeviceToken": '00000000-0000-0000-0000-000000000000',
+            "Device": "3",
+            "DeviceType": "iphone_11_pro_max",
+            "SystemVersion": '13.4.1',
+            "AppVersion": '3',
+            "AID": '',
+            "BodySize": '',
+            "SK": '',
+            /// 傳送目前站點Site 的代號
+            "Site": site
+        },
+        error: function(xhr) {
+            console.log(xhr);
+            showTopTextMsg('請求失敗');
+        },
+        success: function(response) {
+            domainJson = response;
+            responseJson = JSON.stringify(response, null, '\t');
+            showTopTextMsg(responseJson);
+
+
+            // 顯示tz api
+            if (response.tzAPI) {
+                document.getElementById("ApiText").value = JSON.stringify(response.tzAPI, null, '\t')
+            }
+            // 顯示ku api
+            if (response.kuAPIv2) {
+                document.getElementById("ApiText").value = JSON.stringify(response.kuAPIv2, null, '\t')
+            }
+
+            // 顯示會員端
+            if (response.memberAPIv2) {
+                document.getElementById("WebText").value = JSON.stringify(response.memberAPIv2, null, '\t')
+            } else if (response.memberAPI) {
+                document.getElementById("WebText").value = JSON.stringify(response.memberAPI, null, '\t')
+            }
+
+            // 改變測速清單
+            changeTestList()
+        },
+        complete: function(jqXHR, textStatus) {
+            console.log('complete');
+            console.log(jqXHR);
+            console.log(textStatus);
+        }
+    });
+}
+
+// 請求 tsAPI (目前只先寫 get)
+function callApi() {
+
+    var body = document.getElementById("bodyJsonData").value;
+    if (!!body) {
+        var obj = JSON.parse(body);
+    }
+
+    // 取得站別
+    var site = document.getElementById("app_site").value;
+    var apiMethod = $("#apiMethod").val();
+    var apiPath = $("#apiPath").val();
+    var token = $("#token").val();
+
+    var domain = $("#apiDomain :selected").text();
+
+    var responseJson;
+
+    var url = domain + apiPath;
+    showMsg(domain + apiPath + '\n請求中....')
+    $.ajax({
+        url: url,
+        crossDomain: true,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(obj),
+        headers: {
+            'TSSite': site,
+            'Authorization': token,
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+        },
+        error: function(xhr) {
+            console.log(xhr);
+            alert('請求失敗');
+        },
+        success: function(response) {
+            responseJson = JSON.stringify(response, null, '\t')
+            showMsg(responseJson);
+
+        }
+    });
+
+
+    // // 建立測速元件
+    // var oReq = new XMLHttpRequest();
+
+    // oReq.addEventListener("progress", updateProgress);
+    // oReq.addEventListener("load", transferComplete);
+    // oReq.addEventListener("error", transferFailed);
+    // oReq.addEventListener("abort", transferCanceled);
+    // oReq.addEventListener("onreadystatechange", transferReadystatechange);
+
+    // oReq.open("GET", imgUrl);
+
+
+    // oReq.onreadystatechange = function() {
+    //     if (oReq.readyState == XMLHttpRequest.HEADERS_RECEIVED) {
+    //         var status = oReq.status;
+    //         if (status != 200) {
+    //             console.log("HttpsPostToService; Headers received; Error. Status: " + status + ". Status text: " + oReq.statusText, 4);
+    //             return;
+    //         }
+    //     } else if (oReq.readyState == XMLHttpRequest.DONE) {
+    //         var status = oReq.status;
+    //         if (status != 200) {
+    //             console.log("HttpsPostToService; Done; Not OK. Status: " + status + ". Status text: " + oReq.statusText, 4);
+    //             return;
+    //         }
+    //         var data = null;
+    //         data = oReq.responseText;
+    //         console.log("HttpsPostToService; Done; OK. Received following data:", data.length / 1024);
+    //         console.log("HttpsPostToService; ", data.length / 1024, 4);
+    //         console.log(data.length / 1024);
+    //     }
+    // }
+
+
+    // oReq.send(JSON.stringify(obj));
+}
+
+/// 顯示上方 備用API回傳訊息
+function showTopTextMsg(str) {
+    document.getElementById("topText").value = str
+}
+
+/// 顯示下方 TSAPI回傳訊息
+function showMsg(str) {
+    document.getElementById("text").value = str
+}
+
+
+$(function() {
+    var itemNum;
+    var start_time;
+    var imgSpeedTest = function(num) {
+        itemNum = num
+        var obj = $('.speed').eq(itemNum);
+        if (obj.length != 1) {
+            return false;
+        }
+        obj.html('測速中...');
+
+
+        start_time = new Date().getTime(); // 開始時間
+
+        // 取得站別
+        var site = document.getElementById("app_site").value;
+        // 取得域名類別
+        var domainType = document.getElementById("app_domainType").value;
+
+        var imgUrl = ""
+        switch (domainType) {
+            case "tsapi":
+                imgUrl = obj.data('url') + '/speed.ashx' + "?" + (Math.random() + '')
+                break;
+            case "kuapi":
+                imgUrl = obj.data('url') + '/s/100kb' + "?" + (Math.random() + '')
+                break;
+            case "web":
+                switch (site) {
+                    case '16':
+                    case '18':
+                    case '19':
+                    case '20':
+                        imgUrl = obj.data('url') + '/s/100kb' + "?" + (Math.random() + '')
+                        break;
+                    default:
+                        imgUrl = obj.data('url') + '/speed.ashx' + "?" + (Math.random() + '')
+                }
+
+                break;
+            case "rsBackapi":
+                imgUrl = obj.data('url') + '/SpeedTest.ashx' + "?" + (Math.random() + '')
+                break;
+            case "downloadApi":
+                imgUrl = obj.data('url') + '/SpeedTest.ashx' + "?" + (Math.random() + '')
+                break;
+        }
+        console.log("obj.data url", obj.data('url'));
+        console.log(imgUrl);
+
+        if (imgUrl == "") {
+            alert("測速網址有誤 " + imgUrl);
+            return;
+        }
+        // 建立測速元件
+        var oReq = new XMLHttpRequest();
+
+
+        oReq.addEventListener("progress", updateProgress);
+        oReq.addEventListener("load", transferComplete);
+        oReq.addEventListener("error", transferFailed);
+        oReq.addEventListener("abort", transferCanceled);
+        oReq.addEventListener("onreadystatechange", transferReadystatechange);
+
+        // 增加timeout時間
+        // oReq.timeout = 5000;
+        oReq.open("GET", imgUrl);
+        oReq.responseType = 'blob';
+
+        oReq.onreadystatechange = function() {
+            if (oReq.readyState == XMLHttpRequest.HEADERS_RECEIVED) {
+                var status = oReq.status;
+                if (status != 200) {
+                    $('.speed').eq(itemNum).html("憑證有問題 Headers received; Error. Status: " + status + ". Status text: " + oReq.statusText, 4);
+                    return;
+                }
+            } else if (oReq.readyState == XMLHttpRequest.DONE) {
+                var status = oReq.status;
+                if (status != 200) {
+
+                    $('.speed').eq(itemNum).html("HttpsPostToService; Done; Not OK. Status: " + status + ". Status text: " + oReq.statusText, 4);
+                    return;
+                }
+                var data = null;
+                data = oReq.response;
+                $('.speed').eq(itemNum).html(data.type + "(" + data.size + ") --> ");
+            }
+        }
+
+
+        oReq.send();
+
+    };
+
+    // ...
+
+    // progress on transfers from the server to the client (downloads)
+    function updateProgress(oEvent) {
+        if (oEvent.lengthComputable) {
+            var percentComplete = oEvent.loaded / oEvent.total;
+            $('.speed').eq(itemNum).html("測速中: " + percentComplete);
+            // ...
+        } else {
+            // Unable to compute progress information since the total size is unknown
+        }
+    }
+
+    function transferComplete(evt) {
+        var end_time = new Date().getTime(); // 結束時間
+        var pass_time = (end_time - start_time) + ' 毫秒';
+        $('.speed').eq(itemNum).append(pass_time);
+        imgSpeedTest(++itemNum);
+    }
+
+    function transferFailed(evt) {
+        $('.speed').eq(itemNum).append("<br>An error occurred while transferring the file." + `${evt.type}: ${evt.loaded} bytes transferred\n`);
+        console.log(evt)
+        imgSpeedTest(++itemNum);
+    }
+
+    function transferCanceled(evt) {
+        $('.speed').eq(itemNum).append("<br>The transfer has been canceled by the user.");
+        $('.speed').eq(itemNum).html(evt);
+        console.log(evt)
+        imgSpeedTest(++itemNum);
+    }
+
+    function transferReadystatechange(evt) {
+        if (evt.readyState === 4) {
+            if (evt.status === 200) {
+                console.log(evt.responseText)
+            } else {
+                console.log("Error", evt.statusText);
+            }
+        }
+    }
+
+    $(document).on('click', '#btnTest', function() {
+        obj_n = 0;
+        // testSpeed();
+        imgSpeedTest(0);
+    });
+
+    $(document).on('click', '#login', function() {
+        login_start_time = new Date().getTime(); // 開始登入時間
+        callLoginApi();
+    });
+});
+
+// $(function() {
+//     var obj_n;
+//     var start_time;
+//     var picLoad = function() {
+//         var end_time = new Date().getTime(); // 結束時間
+//         var pass_time = (end_time - start_time) + ' 毫秒';
+//         $('.speed').eq(obj_n).html(pass_time);
+//         nextTest();
+//     };
+//     var picError = function(err) {
+//         $('.speed').eq(obj_n).html("無法連結");
+//         console.log(err)
+//         nextTest();
+//     };
+//     var nextTest = function() {
+//         ++obj_n;
+//         $('.speed').eq(obj_n).html('測速中...');
+//         setTimeout(function() {
+//             testSpeed();
+//         }, 500);
+//     };
+
+
+//     var testSpeed = function() {
+//         var obj = $('.speed').eq(obj_n);
+//         if (obj.length != 1) {
+//             return false;
+//         }
+//         obj.html('測速中...');
+//         // 建立 img 元素
+//         var pic = document.createElement('img');
+//         pic.onload = picLoad;
+//         pic.onerror = picError;
+//         start_time = new Date().getTime(); // 開始時間
+
+//         // 取得站別
+//         var site = document.getElementById("app_site").value;
+//         // 取得域名類別
+//         var domainType = document.getElementById("app_domainType").value;
+
+//         switch (domainType) {
+//             case "tsapi":
+//                 pic.src = obj.data('url') + '/speed.ashx' + "?" + (Math.random() + '')
+//                 break;
+//             case "kuapi":
+//                 pic.src = obj.data('url') + '/s/100kb' + "?" + (Math.random() + '')
+//                 break;
+//             case "web":
+//                 switch (site) {
+//                     case '16':
+//                     case '18':
+//                     case '19':
+//                         pic.src = obj.data('url') + '/s/100kb' + "?" + (Math.random() + '')
+//                         break;
+//                     default:
+//                         pic.src = obj.data('url') + '/speed.ashx' + "?" + (Math.random() + '')
+//                 }
+
+//                 break;
+//             case "rsBackapi":
+//                 pic.src = obj.data('url') + '/SpeedTest.ashx' + "?" + (Math.random() + '')
+//                 break;
+//             case "downloadApi":
+//                 pic.src = obj.data('url') + '/SpeedTest.ashx' + "?" + (Math.random() + '')
+//                 break;
+//         }
+//         console.log("obj.data url", obj.data('url'));
+//         console.log(pic.src);
+
+
+//     };
+//     $(document).on('click', '#btnTest', function() {
+//         obj_n = 0;
+//         // testSpeed();
+//         imgSpeedTest(0);
+//     });
+
+//     $(document).on('click', '#login', function() {
+//         login_start_time = new Date().getTime(); // 開始登入時間
+//         callLoginApi();
+//     });
+// });
+
+function createSpeedTestBox() {
+    $('#domainList').html(`
+        <!-- 測速標題 -->
+        <li>
+            <label id="description" for="text" style="color:orange;">目前使用預設線路</label>
+            </p>
+        </li>
+        <!-- 測速 -->
+        <span class="speedList" style="font-size:18px;">
+            <div class="speed" data-url="https://testmmapi.tz111.net"></div>
+        </span>
+          
+        <div>
+            </p>
+            <button id="btnTest">測速</button>
+            </p>
+        </div>
+        <hr>
+        `);
+}
+
+function createWebSpeedTestBox() {
+    $('#domainList').html(`
+        <!-- 測速標題 -->
+        <li>
+            <label id="description" for="text" style="color:orange;">目前使用預設線路</label>
+            </p>
+        </li>
+        <!-- 測速 -->
+        <span class="speedList" style="font-size:18px;">
+            <div class="speed" data-url="https://testmmapi.tz111.net"></div>
+        </span>
+          
+        <div>
+            </p>
+            <button id="btnTest">測速</button>
+            </p>
+        </div>
+        <hr>
+        `);
+}
+
+function getLocalIP() {
+    $('#localIPtext').html('偵測中...');
+    $.getJSON("https://api.ipify.org/?format=json", function(e) {
+        $('#localIPtext').html('本地IP:' + e.ip);
+    });
+}
+
+function encryptByDES(message) {
+    var defaultKey = "vnjs*&%5&dew";
+    var MD5 = CryptoJS.MD5(defaultKey).toString();
+
+    var md5Key = MD5.substring(0, 8);
+
+    var key = CryptoJS.enc.Utf8.parse(md5Key);
+    var iv = CryptoJS.enc.Utf8.parse(md5Key);
+
+    // DES 加密
+    var encrypted = CryptoJS.DES.encrypt(message, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+
+    var hexStr = encrypted.ciphertext.toString().toUpperCase();
+    // 转换为字符串
+    return hexStr;
+}
+
+// 頁面啟動直接執行
+$(function() {
+    getLocalIP();
+})
+</script>
+
+</html>
