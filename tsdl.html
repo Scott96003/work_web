@@ -23,7 +23,7 @@
     </style>
 
 </head>
-
+<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <body>
     <center>
         <div>
@@ -44,10 +44,10 @@
                     </td>
                     <td class="tdText">
                         <select id="app_site" onchange="clic()" style="width:100%;">
-                            <option value="16" selected="">海1</option>
-                            <option value="18" selected="">海2</option>
-                            <option value="19" selected="">海3</option>
-                            <option value="20" selected="">海4</option>
+                            <option value="16">海1</option>
+                            <option value="18">海2</option>
+                            <option value="19">海3</option>
+                            <option value="20">海4</option>
                             <option value="21">山1</option>
                             <option value="2">山2</option>
                             <option value="26">山3</option>
@@ -61,9 +61,9 @@
                     </td>
                     <td class="tdText">
                         <select id="app_type" onchange="clic()" style="width:100%;">
-                            <option value="dev" selected="">測試站</option>
-                            <option value="uat" selected="">前測站</option>
-                            <option value="release" selected="">正式站</option>
+                            <option value="dev">測試站</option>
+                            <option value="uat">前測站</option>
+                            <option value="release">正式站</option>
                         </select>
                     </td>
                 </tr>
@@ -73,7 +73,7 @@
                     </td>
                     <td class="tdText">
                         <select id="appAccount" onchange="clic()" style="width:100%;">
-                            <option value="" selected="">預設憑證</option>
+                            <option value="">預設憑證</option>
                             <option value="reyesannenzrn@icloud.com">新憑證</option>
                         </select>
                     </td>
@@ -109,7 +109,7 @@
             var version = getArgs("v");
             var type = getArgs("t");
             var site = getArgs("s");
-            var assign_acc_id = getArgs("aai"); //放入特定的憑證帳號
+            var assign_acc_id = decodeURIComponent(getArgs("aai")); //放入特定的憑證帳號
 
             var url = new URL(window.location.href);
             url.searchParams.set('v', version);
@@ -147,14 +147,17 @@
             var type = getArgs("t");
             var site = getArgs("s");
             var time = getArgs("time");
-            var assign_acc_id = getArgs("aai"); //放入特定的憑證帳號
+            var assign_acc_id = decodeURIComponent(getArgs("aai")); //放入特定的憑證帳號
             console.log('參數接收的時間戳', time);
 
+            //將傳入的參數放入到選項中
             document.getElementById("app_version").value = version || 1;
             document.getElementById("app_type").value = type || "dev";
             document.getElementById("app_site").value = site || "21";
+            //如果有傳入指定憑證帳號, 增加option並選定
             if (assign_acc_id) {
-                document.getElementById("appAccount").value = "reyesannenzrn@icloud.com";
+                jQuery("#appAccount").append(new Option(assign_acc_id,assign_acc_id));
+                jQuery("#appAccount").val(assign_acc_id).change();
             } else {
                 document.getElementById("appAccount").value = "";
             }
@@ -210,6 +213,12 @@
                     if (app_acc_id == "") {
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + url + ".plist\">" + url + "</a><br/>"
                     } else {
+                        var newPath = "/appVersion/iosVersion/" + site + "/" + version + "/"+app_acc_id+"_";
+
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + newPath + url + ".plist\">" + url + "</a><br/>"
+
+                        /* 此方法先暫時不用, 因為動態plist只會使用最新版本的版號
+
                         //下載參數, 判斷是否有指定憑證
                         if (assign_acc_id) {
                             var queryString = plist_get_querystring(type,site,assign_acc_id);                            
@@ -220,6 +229,7 @@
                         //編碼後才可以放入
                         var auto_plist_url = encodeURIComponent("https://" + url + "/PlistInstall.ashx" + queryString);
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + app_acc_text + "-" +url + "</a><br/>"
+                        */
                     }                
                 }
             }
