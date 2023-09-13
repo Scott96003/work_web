@@ -1,0 +1,470 @@
+
+<!-- 更新日期 2023/9/5 -->
+<!-- saved from url=(0070)https://dlcd.testtz886.net/tsdl.html?v=303%2526t&t=&s=&time=1691471025 -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Document</title>
+    <style>
+        .ttt {
+            text-align: justify;
+            text-align-last: justify;
+            width: 80px;
+        }
+        .tdText {
+            text-align: right;
+            text-align-last: right;
+            width: 100px;
+        }
+        table {
+            /* max-width: 440px; */
+        }
+    </style>
+
+</head>
+
+<body>
+    <center>
+        <div>
+            <table style="table-layout:fixed;">
+                <tbody>                
+                <tr>
+                    <td class="ttt">
+                        版本號
+                    </td>
+
+                    <td class="tdText">
+                        <input id="app_version" value="1" onchange="clic()" style="width:100%;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ttt">
+                        分站
+                    </td>
+                    <td class="tdText">
+                        <select id="app_site" onchange="clic()" style="width:100%;">
+                            <option value="16" selected="">海1</option>
+                            <option value="18" selected="">海2</option>
+                            <option value="19" selected="">海3</option>
+                            <option value="20" selected="">海4</option>
+                            <option value="21">山1</option>
+                            <option value="2">山2</option>
+                            <option value="26">山3</option>
+                            <option value="35">山4</option>
+                            <option value="5">山5</option>
+                        </select>
+                    </td>
+                </tr>
+                    <td class="ttt">
+                        測試區域
+                    </td>
+                    <td class="tdText">
+                        <select id="app_type" onchange="clic()" style="width:100%;">
+                            <option value="dev" selected="">測試站</option>
+                            <option value="uat" selected="">前測站</option>
+                            <option value="release" selected="">正式站</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ttt">
+                        使用憑證
+                    </td>
+                    <td class="tdText">
+                        <select id="appAccount" onchange="clic()" style="width:100%;">
+                            <option value="" selected="">預設憑證</option>
+                            <option value="reyesannenzrn@icloud.com">新憑證</option>
+                        </select>
+                    </td>
+                </tr>
+
+            </tbody></table>
+
+        </div>
+
+        <br>
+
+        <!-- 
+		<button onclick="clic()">產生下載連結</button></br>
+		-->
+        <!-- 連結內容 -->
+        <div id="download_list"><span>請點選線路下載 LEO 21站 測試站 版本:303%2526t</span><br><br><a href="itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://dlin.testtz886.net/appVersion/iosVersion/21/303%2526t/ts_dlin.testtz886.net.plist">dlin.testtz886.net</a><br><br><br><a href="itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://dlcd.testtz886.net/appVersion/iosVersion/21/303%2526t/ts_dlcd.testtz886.net.plist">dlcd.testtz886.net</a><br></div>
+    </center>
+
+
+
+    <script type="text/javascript">
+
+        ///取得目前的時間戳
+        const dateTime = Date.now();
+        const timestamp = Math.floor(dateTime / 1000);
+        console.log('目前系統的時間戳', timestamp);
+        if (checkTimestamp(5) == true) {
+            ///啟動eruda
+            setInput()
+            clic()
+        } else {
+            console.log("時間戳超過使用期限, 重新載入")
+            var version = getArgs("v");
+            var type = getArgs("t");
+            var site = getArgs("s");
+            var assign_acc_id = getArgs("aai"); //放入特定的憑證帳號
+
+            var url = new URL(window.location.href);
+            url.searchParams.set('v', version);
+            url.searchParams.set('t', type);
+            url.searchParams.set('s', site);
+            url.searchParams.set('aai', assign_acc_id);
+            url.searchParams.set('time', timestamp);
+            window.location.href = url.href;
+        }
+
+
+        ///檢查時間戳, 超過5秒重新載入
+        function checkTimestamp(ck_time) {
+            if (ck_time) {
+                
+            } else {
+                console.log("checktime 沒給值使用預設5");
+                ck_time = 5
+            }
+            var time = getArgs("time");
+            if (time == undefined) {
+                return false
+            } else {
+                var t = parseInt(time) + 5;
+                if (isNaN(t)) {
+                    return false
+                }
+                return (timestamp < t);
+            }
+        }
+
+        ///設定輸入
+        function setInput() {
+            var version = getArgs("v");
+            var type = getArgs("t");
+            var site = getArgs("s");
+            var time = getArgs("time");
+            var assign_acc_id = getArgs("aai"); //放入特定的憑證帳號
+            console.log('參數接收的時間戳', time);
+
+            document.getElementById("app_version").value = version || 1;
+            document.getElementById("app_type").value = type || "dev";
+            document.getElementById("app_site").value = site || "21";
+            if (assign_acc_id) {
+                document.getElementById("appAccount").value = "reyesannenzrn@icloud.com";
+            } else {
+                document.getElementById("appAccount").value = "";
+            }
+            
+            
+        }
+
+        function getArgs(key) {
+            var url = window.location.toString();
+
+            if (url.indexOf("?") != -1) {
+                var ary = url.split("?")[1].split("&");
+
+                for (var i in ary) {
+                    var keyValue = ary[i].split("=")
+                    if (keyValue[0] == key) {
+                        return keyValue[1]
+                    }
+                }
+            }
+            return ""
+        }
+
+        //更換變數的時候
+        function clic() {
+            var assign_acc_id = getArgs("aai");
+
+            var version = document.getElementById("app_version").value;
+            var typeObj = document.getElementById("app_type");
+            var langObj = document.getElementById("app_site");
+            var appAcc = document.getElementById("appAccount");
+            var type = typeObj.value;
+            var typeName = typeObj[typeObj.selectedIndex].text;
+            var site = langObj.value;
+            var siteName = langObj[langObj.selectedIndex].text;
+            var app_acc_id = appAcc.value;
+            var app_acc_text = appAcc[appAcc.selectedIndex].text;
+
+            
+            console.log("assign_acc_id=" + assign_acc_id);
+            console.log("siteName:", site);            
+            console.log("type:", type);
+
+            document.getElementById("download_list").innerHTML = "<span>請點選線路下載<br>" + typeName + " " + siteName + " 版本:" + version + "</span>";
+            var domains = getDomains(type, site, version)
+
+            for (var x = 0; x < domains.length; x++) {
+                let path = domains[x].path
+                let hosts = domains[x].hosts
+                for (var y = 0; y < hosts.length; y++) {
+                    let url = hosts[y]
+
+                    if (app_acc_id == "") {
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + url + ".plist\">" + url + "</a><br/>"
+                    } else {
+                        //下載參數, 判斷是否有指定憑證
+                        if (assign_acc_id) {
+                            var queryString = plist_get_querystring(type,site,assign_acc_id);                            
+                        } else {
+                            var queryString = plist_get_querystring(type,site,app_acc_id);
+                        }
+                        console.log("queryString="+queryString)
+                        //編碼後才可以放入
+                        var auto_plist_url = encodeURIComponent("https://" + url + "/PlistInstall.ashx" + queryString);
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=" + auto_plist_url + "\">" + app_acc_text + "-" +url + "</a><br/>"
+                    }                
+                }
+            }
+        }
+
+        function getDomains(type, site, version) {
+            let domains = []
+            // 2022 10/7 更新
+            let domains_cntw = [
+                "d.mbd66in.net",
+                "d.mbd77cd.net",
+                "d.mbd77tf.net",
+                "dcc.niuniuad.com",
+                "d.mbd66obs.net",
+                "d.mbd66ni.net"]
+            let domains_vi = [
+                "d.mbd18in.net",
+                "d.mbd18cd.net",
+                "d.mbd18tf.net",
+                "d.mbd18obs.net"]
+            let domains_th = [
+                "d.mbd19in.net",
+                "d.mbd19cd.net",
+                "d.mbd19tf.net",
+                "d.mbd19cf.net",
+                "d.mbd19obs.net"]
+            let domains_id = [
+                "d.mbd20in.net",
+                "d.mbd20cd.net",
+                "d.mbd20tf.net",
+                "d.mbd20obs.net"]
+            if (type == "uat") {
+                switch (site) {
+                case "16":
+                case "18":
+                case "19":
+                case "20":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": ["uatdl.tz886in.net",
+                              "uatdl.tz886cd.net",
+                              "uatdl.tz886sp.net",
+                              "uatdl.tz886cf.net",
+                              "uatdl.tz886tf.net",
+                              "uatdl.tz886ws.net"]
+                        }
+                        ]
+                    break;
+                default:
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
+                            "hosts": ["uatdl.tz886in.net",
+                              "uatdl.tz886cd.net",
+                              "uatdl.tz886sp.net",
+                              "uatdl.tz886cf.net",
+                              "uatdl.tz886tf.net",
+                              "uatdl.tz886ws.net"]
+                        }
+                        ]
+                }
+                return domains
+            } else if (type == "release") {
+                switch (site) {
+                case "16":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": domains_cntw
+                        }
+                        ]
+                    break;
+				case "2": case "21": case "26": case "35": 
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
+                            "hosts": domains_cntw
+                        }
+                        ]
+                    break;
+				case "18":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": domains_vi
+                        }
+                        ]
+                    break;
+				case "5":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
+                            "hosts": domains_vi
+                        }
+                        ]
+                    break;
+				case "19":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": domains_th
+                        }
+                        ]
+                    break;
+                case "20":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": domains_id
+                        }
+                        ]
+                    break;
+                default:
+                domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
+                            "hosts": []
+                        }
+                        ]
+                }
+                return domains
+            } else {
+                switch (site) {
+                case "16":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": ["dlin.testtz886.net", "dlcd.testtz886.net"]
+                        }
+                        ]
+                    break;
+                case "18":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": ["dlin.testtz886.net", "dlcd.testtz886.net"]
+                        }
+                        ]              
+                    break;
+                case "19":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": ["dlin.testtz886.net", "dlcd.testtz886.net"]
+                        }
+                        ]
+                    break;
+                case "20":
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
+                            "hosts": ["dlin.testtz886.net", "dlcd.testtz886.net"]
+                        }
+                        ]
+                    break;
+                default:
+                    domains = [
+                        {
+                            "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
+                            "hosts": ["dlin.testtz886.net", "dlcd.testtz886.net"]
+                        }
+                        ]
+                }
+                return domains
+            }
+            
+        }
+
+        // 取得 plist k 值
+        function plist_get_querystring(type,site,acc) {
+            console.log("使用特定憑證:" + acc);
+            //取得 k 值
+            var plist_k = ""
+            if (type == "dev") {
+                // 測試站
+                switch (site) {
+                    case "16":
+                        plist_k = "D869AB46BC91C065A91034551B842BDA";
+                        break;
+                    case "18":
+                        plist_k = "A779652626F0FA7CBE9FFF1B22F9A795";
+                        break;
+                    case "19":
+                        plist_k = "A4DD7F43E860C5A7F1E9B352687A4938";
+                        break;
+                    case "20":
+                        plist_k = "D2978E837C03D1F3BF7E3D947E7E7E92";
+                        break;
+                    case "21":
+                        plist_k = "32AD3597A3E87A106579938F58652FD8";
+                        break;
+                    case "2":
+                        plist_k = "9E5A5736B8834B79B10CA4CE7562F019";
+                        break;
+                    case "26":
+                        plist_k = "598DF6DFB9239FA27CAE4A086995C161";
+                        break;
+                    case "35":
+                        plist_k = "19C3085301FE244F9B1D3DB399E3D4B9";
+                        break;
+                    case "5":
+                        plist_k = "2C189894458F78493245F1CC6DDA68AD";
+                        break;
+                }
+            } else {
+                // 正式站 前測
+                switch (site) {
+                    case "16":
+                        plist_k = "2A228418A877859A39BA538A2234DD4F";
+                        break;
+                    case "18":
+                        plist_k = "C7276F40044676A508525F2D6E1390B6";
+                        break;
+                    case "19":
+                        plist_k = "D845F5392D8EF2F6DFAF1FF827566B64";
+                        break;
+                    case "20":
+                        plist_k = "407D52E97A940F5AAA5CDE633248673D";
+                        break;
+                    case "21":
+                        plist_k = "48E95829EC2D03E2CE4262172C4EC7F8";
+                        break;
+                    case "2":
+                        plist_k = "8123BC52C20EC976C8F306BFC2A2B386";
+                        break;
+                    case "26":
+                        plist_k = "959F53073A38CD4BD32AF260C8ED351A";
+                        break;
+                    case "35":
+                        plist_k = "94251309b71e2ef083c2617ad984bc13";
+                        break;
+                    case "5":
+                        plist_k = "48BF5F2AEA4A8B40F8D293A646412ED4";
+                        break;
+                }           
+            }
+
+            //取得da值
+            var plist_da = window.btoa(acc)
+
+            return "?site="+site+"&k="+plist_k+"&da="+plist_da
+        }
+    </script>
+
+<div></div>
+
+</body></html>
