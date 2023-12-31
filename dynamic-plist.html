@@ -21,12 +21,10 @@
     const domain = getURLParameter('domain');
     const type = getURLParameter('type');
 
-
     const build = "1";
 
     // 生成隨機數字
-    const randomTimestamp = Date.now(); // 或使用 Math.random() * 1000000000（或其他方法）生成您想要的數字範圍
-
+    const randomTimestamp = Date.now();
 
     // ipa URL
     const ipa_url = (() => {
@@ -47,7 +45,6 @@
         return `https://${domain}/appVersion/iosVersion/${site}/${version}/${ipaName}?_t=${randomTimestamp}`;
     })();
 
-
     // icon名稱
     const icon_path = (() => {
         const iconFileMapping = {
@@ -67,11 +64,9 @@
         return `https://${domain}/images/${iconName}?_t=${randomTimestamp}`;
     })();
 
-
     // app Apple ID
     const bundleId = (function () {
         return function (account, site, type) {
-
             const atIndex = account.indexOf('@');
             const extractUsername = atIndex !== -1 ? account.slice(0, atIndex) : account;
             const baseString = `com.${extractUsername}.app${site}`;
@@ -88,7 +83,7 @@
     // app名稱
     const appName = `KUBET v${version}`;
 
-
+    // plist 內容
     const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -129,13 +124,8 @@
     </dict>
     </plist>`;
 
-
-    // 創建包含 plist 內容的 Blob
-    const plistBlob = new Blob([plistContent], { type: 'application/xml' });
-
-    // 將 Blob 轉換為 data URI
+    // 將 plist 內容轉換為 data URI
     const dataURI = `data:application/xml;base64,${btoa(plistContent)}`;
-    
 
     // 將 data URI 賦值給地址欄，以便手動保存 plist 文件
     window.location.href = dataURI;

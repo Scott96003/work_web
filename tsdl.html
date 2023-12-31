@@ -487,9 +487,9 @@
         function downloadPlist(account, site, version, domain, type) {
             // 取得當前網頁的網域
             const currentDomain = window.location.origin;
-
+            
             // 替換成實際的 plist 生成頁面 URL
-            const dynamicPlistURL = `${currentDomain}/dynamic-plist.html?account=${account}&site=${site}&version=${version}&domain=${domain}&type=${type}`;
+            const dynamicPlistURL = `https://dynamic-plist.onrender.com/generatePlist?account=${account}&site=${site}&version=${version}&domain=${domain}&type=${type}`;
 
             // 創建包含 itms-services 的按鈕
             const installButton = document.createElement("a");
