@@ -217,7 +217,7 @@
                     } else {
                         // 在按鈕的 onclick 事件中呼叫 generatePlist 並傳遞參數
                         document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='generatePlist(\"" + app_acc_id + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
-
+                        
                         /* 此為之前的下載方法
                         var newPath = "/appVersion/iosVersion/" + site + "/" + version + "/"+app_acc_id+"_";
 
@@ -598,7 +598,7 @@
 
             // 動態生成包含動態 plist URL 的按鈕
             const downloadButton = document.createElement("a");
-            downloadButton.href = `itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dataURI)}`;
+            downloadButton.href = `itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dataURI)}`;
             downloadButton.textContent = "Download App";
             document.body.appendChild(downloadButton);
             // Trigger a click on the link to start the download
