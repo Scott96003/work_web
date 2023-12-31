@@ -26,7 +26,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <body>
     <center>
-        <p>ver 0003</p>
+        <p>ver 0004</p>
         <div>
             <table style="table-layout:fixed;">
                 <tbody>                
@@ -494,141 +494,13 @@
             installButton.textContent = "Install App";
             document.body.appendChild(installButton);
 
-            // 延遲觸發 click 事件
+            installButton.click();
+            // 延遲觸發 delete事件
             setTimeout(() => {
-                installButton.click();
                 // Remove the link from the body
                 document.body.removeChild(installButton);
-            }, 1000); // 假設 1000 毫秒（1 秒）後觸發，您可以根據實際情況調整這個時間
+            }, 5000); // 假設 1000 毫秒（1 秒）後觸發，您可以根據實際情況調整這個時間
         }
-
-        // 產生Plist提供下載
-        function generatePlist(account, site, version, domain, type) {
-
-            const build = "1";
-
-            // 生成隨機數字
-            const randomTimestamp = Date.now(); // 或使用 Math.random() * 1000000000（或其他方法）生成您想要的數字範圍
-
-
-            // ipa URL
-            const ipa_url = (() => {
-                const ipaNameMapping = {
-                    16: "ku.ipa",
-                    18: "ku.ipa",
-                    19: "ku.ipa",
-                    20: "ku.ipa",
-                    2: "ts.ipa",
-                    5: "ts.ipa",
-                    21: "ts.ipa",
-                    26: "ts.ipa",
-                    35: "ts.ipa",
-                    // 添加其他可能的 site 映射
-                };
-
-                const ipaName = ipaNameMapping[site] || "default.ipa";
-                return `https://${domain}/appVersion/iosVersion/${site}/${version}/${ipaName}?_t=${randomTimestamp}`;
-            })();
-
-
-            // icon名稱
-            const icon_path = (() => {
-                const iconFileMapping = {
-                    16: "cn/ku_vip_icon.png",
-                    18: "vn/ku_vip_icon.png",
-                    19: "th/ku_vip_icon.png",
-                    20: "th/ku_vip_icon.png",
-                    2: "zh/tha_icon.png",
-                    5: "vi/tha_icon.pnga",
-                    21: "zh/leo_icon.png",
-                    26: "cn/bet9_icon.png",
-                    35: "cn/bet8_icon.png",
-                    // 添加其他可能的 site 映射
-                };
-
-                const iconName = iconFileMapping[site] || "cn/ku_vip_icon.png";
-                return `https://${domain}/images/${iconName}?_t=${randomTimestamp}`;
-            })();
-
-
-            // app Apple ID
-            const bundleId = (function () {
-                return function (account, site, type) {
-
-                    const atIndex = account.indexOf('@');
-                    const extractUsername = atIndex !== -1 ? account.slice(0, atIndex) : account;
-                    const baseString = `com.${extractUsername}.app${site}`;
-                    
-                    // 根據 type 動態添加後綴
-                    const resultString = type === 'dev' ? `${baseString}.dev` :
-                                        type === 'uat' ? `${baseString}.uat` :
-                                        baseString;
-
-                    return resultString;
-                };
-            })();
-
-            // app名稱
-            const appName = `KUBET v${version}`;
-            
-
-            const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-                <key>items</key>
-                <array>
-                    <dict>
-                        <key>assets</key>
-                        <array>
-                            <dict>
-                                <key>kind</key>
-                                <string>software-package</string>
-                                <key>url</key>
-                                <string>${ipa_url}</string>
-                            </dict>
-                            <dict>
-                                <key>kind</key>
-                                <string>display-image</string>
-                                <key>needs-shine</key>
-					            <true/>
-                                <key>url</key>
-                                <string>${icon_path}</string>
-                            </dict>
-                        </array>
-                        <key>metadata</key>
-                        <dict>
-                            <key>bundle-identifier</key>
-                            <string>${bundleId(account, site, type)}</string>
-                            <key>bundle-version</key>
-                            <string>${version}</string>
-                            <key>kind</key>
-                            <string>software</string>
-                            <key>title</key>
-                            <string>${appName}</string>
-                        </dict>
-                    </dict>
-                </array>
-            </dict>
-            </plist>`;
-
-
-            // 將 plist 內容轉換為 data URI
-            const dataURI = `data:application/xml;base64,${btoa(plistContent)}`;
-
-            // 動態生成包含動態 plist URL 的按鈕
-            const downloadButton = document.createElement("a");
-            downloadButton.href = `itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dataURI)}`;
-            downloadButton.textContent = "Download App";
-            document.body.appendChild(downloadButton);
-            // Trigger a click on the link to start the download
-            downloadButton.click();
-
-            // Remove the link from the body
-            document.body.removeChild(downloadButton);
-        }
-
-
     </script>
 
 <div></div>
