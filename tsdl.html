@@ -26,7 +26,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <body>
     <center>
-        <p>ver 0002</p>
+        <p>ver 0003</p>
         <div>
             <table style="table-layout:fixed;">
                 <tbody>                
@@ -485,9 +485,6 @@
         }
 
         function downloadPlist(account, site, version, domain, type) {
-            // 取得當前網頁的網域
-            const currentDomain = window.location.origin;
-            
             // 替換成實際的 plist 生成頁面 URL
             const dynamicPlistURL = `https://dynamic-plist.onrender.com/generatePlist?account=${account}&site=${site}&version=${version}&domain=${domain}&type=${type}`;
 
@@ -496,11 +493,13 @@
             installButton.href = `itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dynamicPlistURL)}`;
             installButton.textContent = "Install App";
             document.body.appendChild(installButton);
-            // Trigger a click on the link to start the download
-            installButton.click();
 
-            // Remove the link from the body
-            document.body.removeChild(installButton);
+            // 延遲觸發 click 事件
+            setTimeout(() => {
+                installButton.click();
+                // Remove the link from the body
+                document.body.removeChild(installButton);
+            }, 1000); // 假設 1000 毫秒（1 秒）後觸發，您可以根據實際情況調整這個時間
         }
 
         // 產生Plist提供下載
