@@ -26,7 +26,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <body>
     <center>
-        <p>ver 0004</p>
+        <p>ver 0005</p>
         <div>
             <table style="table-layout:fixed;">
                 <tbody>                
@@ -214,7 +214,7 @@
                     if (app_acc_id == "") {
                         const account = "ququ200901"
                         // 在按鈕的 onclick 事件中呼叫 generatePlist 並傳遞參數
-                        document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='generatePlist(\"" + account + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
+                        document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='downloadPlist(\"" + account + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
                     } else {
                         // 在按鈕的 onclick 事件中呼叫 generatePlist 並傳遞參數
                         document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='downloadPlist(\"" + app_acc_id + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
