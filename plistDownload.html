@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Install IPA</title>
+</head>
+<body>
+
+<!-- 使用 JavaScript 生成 plist 文件的內容 -->
+<script>
+    const ipaURL = "https://dlcd.testtz886.net/appVersion/iosVersion/16/1224/ku.ipa?_t=1703817148"; // 替換成實際的 IPA 文件 URL
+    const bundleIdentifier = "com.ququ200901.app16.dev"; // 替換成實際的 Bundle Identifier
+    const bundleVersion = "1224"; // 替換成實際的應用程式版本號
+
+    const plistContent = `<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>items</key>
+            <array>
+                <dict>
+                    <key>assets</key>
+                    <array>
+                        <dict>
+                            <key>kind</key>
+                            <string>software-package</string>
+                            <key>url</key>
+                            <string>https://dlcd.testtz886.net/appVersion/iosVersion/16/1224/ku.ipa?_t=1703817148</string>
+                        </dict>
+                        <dict>
+                            <key>kind</key>
+                            <string>display-image</string>
+                            <key>needs-shine</key>
+                            <true/>
+                            <key>url</key>
+                            <string>https://dlcd.testtz886.net/images/cn/ku_vip_icon.png?_t=1703817148</string>
+                        </dict>
+                    </array>
+                    <key>metadata</key>
+                    <dict>
+                        <key>bundle-identifier</key>
+                        <string>com.ququ200901.app16.dev</string>
+                        <key>bundle-version</key>
+                        <string>1224</string>
+                        <key>kind</key>
+                        <string>software</string>
+                        <key>title</key>
+                        <string>KU原测 v1224</string>
+                    </dict>
+                </dict>
+            </array>
+        </dict>
+        </plist>`;
+
+    // 將 plist 內容轉換為 data URI
+    const dataURI = `data:application/xml;base64,${btoa(plistContent)}`;
+
+    // 創建包含動態 plist URL 的按鈕
+    const installButton = document.createElement("a");
+    installButton.href = `itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dataURI)}`;
+    installButton.textContent = "Install App";
+    document.body.appendChild(installButton);
+</script>
+
+</body>
+</html>
