@@ -26,7 +26,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 <body>
     <center>
-        <p>ver 0002</p>
         <div>
             <table style="table-layout:fixed;">
                 <tbody>                
@@ -68,7 +67,7 @@
                         </select>
                     </td>
                 </tr>
-                <tr>
+                <tr hidden>
                     <td class="ttt">
                         使用憑證
                     </td>
@@ -87,8 +86,8 @@
         <br>
 
         <!-- 
-		<button onclick="clic()">產生下載連結</button></br>
-		-->
+        <button onclick="clic()">產生下載連結</button></br>
+        -->
         <!-- 連結內容 -->
         <div id="download_list"><span>請點選線路下載 LEO 21站 測試站 版本:303%2526t</span><br><br><a href="itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://dlin.testtz886.net/appVersion/iosVersion/21/303%2526t/ts_dlin.testtz886.net.plist">dlin.testtz886.net</a><br><br><br><a href="itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://dlcd.testtz886.net/appVersion/iosVersion/21/303%2526t/ts_dlcd.testtz886.net.plist">dlcd.testtz886.net</a><br></div>
     </center>
@@ -206,26 +205,17 @@
             var domains = getDomains(type, site, version)
 
             for (var x = 0; x < domains.length; x++) {
-                let path = domains[x].path
+                let path = get_plist_url_path(type, site, version);
                 let hosts = domains[x].hosts
                 for (var y = 0; y < hosts.length; y++) {
                     let url = hosts[y]
 
                     if (app_acc_id == "") {
-                        const account = "ququ200901"
-                        // 在按鈕的 onclick 事件中呼叫 generatePlist 並傳遞參數
-                        document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='downloadPlist(\"" + account + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
+                        document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + path + "\">" + url + "</a><br/>"
                     } else {
-                        // 在按鈕的 onclick 事件中呼叫 generatePlist 並傳遞參數
-                        document.getElementById("download_list").innerHTML += "<br/><br/><button onclick='downloadPlist(\"" + app_acc_id + "\", " + site + ", \"" + version + "\", \"" + url + "\", \"" + type + "\")'>" + url + "</button><br/>";
-                        
-                        /* 此為之前的下載方法
                         var newPath = "/appVersion/iosVersion/" + site + "/" + version + "/"+app_acc_id+"_";
 
                         document.getElementById("download_list").innerHTML += "<br/><br/><a href=\"itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=https://" + url + newPath + url + ".plist\">" + url + "</a><br/>"
-                        */
-
-
 
                         /* 此方法先暫時不用, 因為動態plist只會使用最新版本的版號
 
@@ -313,7 +303,7 @@
                         }
                         ]
                     break;
-				case "2": case "21": case "26": case "35": 
+                case "2": case "21": case "26": case "35": 
                     domains = [
                         {
                             "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
@@ -321,7 +311,7 @@
                         }
                         ]
                     break;
-				case "18":
+                case "18":
                     domains = [
                         {
                             "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
@@ -329,7 +319,7 @@
                         }
                         ]
                     break;
-				case "5":
+                case "5":
                     domains = [
                         {
                             "path": "/appVersion/iosVersion/" + site + "/" + version + "/ts_",
@@ -337,7 +327,7 @@
                         }
                         ]
                     break;
-				case "19":
+                case "19":
                     domains = [
                         {
                             "path": "/appVersion/iosVersion/" + site + "/" + version + "/ku_",
@@ -409,9 +399,57 @@
             
         }
 
+        function get_plist_url_path(type, site, version) {
+            var id = get_app_id(type, site);
+            var k = get_plist_k(type, site);
+            var path = "/PlistInstallRC.ashx"
+            var parameter = "?site=" + site + "&k=" + k + "&id=" + id + "&v=" + version;
+            return path + encodeURIComponent(parameter);
+        }
+
+        function get_app_id(type, site) {
+            let app_id = {
+                dev: {
+                    16: "com.ququ200901.app16.dev",
+                    18: "com.ququ200901.app18.dev",
+                    19: "com.ququ200901.app19.dev",
+                    20: "com.ququ200901.app20.dev",
+                    2: "com.ququ200901.app2.dev",
+                    5: "com.ququ200901.app5.dev",
+                    21: "com.ququ200901.app21.dev",
+                    26: "com.ququ200901.app26.dev",
+                    35: "com.ququ200901.app35.dev"
+                },
+                uat: {
+                    16: "com.ququ200901.app16.uat",
+                    18: "com.ququ200901.app18.uat",
+                    19: "com.ququ200901.app19.uat",
+                    20: "com.ququ200901.app20.uat",
+                    2: "com.ququ200901.app2.uat",
+                    5: "com.ququ200901.app5.uat",
+                    21: "com.ququ200901.app21.uat",
+                    26: "com.ququ200901.app26.uat",
+                    35: "com.ququ200901.app35.uat"
+                },
+                release: {
+                    16: "com.ququ200901.app16",
+                    18: "com.ququ200901.app18",
+                    19: "com.ququ200901.app19",
+                    20: "com.ququ200901.app20",
+                    2: "com.ququ200901.app2",
+                    5: "com.ququ200901.app5",
+                    21: "com.ququ200901.app21",
+                    26: "com.ququ200901.app26",
+                    35: "com.ququ200901.app35"
+                }
+            }
+
+            // 使用 btoa 做base64的動作
+            return btoa(app_id[type][site])
+        }
+
         // 取得 plist k 值
-        function plist_get_querystring(type,site,acc) {
-            console.log("使用特定憑證:" + acc);
+        function get_plist_k(type, site) {
             //取得 k 值
             var plist_k = ""
             if (type == "dev") {
@@ -427,7 +465,7 @@
                         plist_k = "A4DD7F43E860C5A7F1E9B352687A4938";
                         break;
                     case "20":
-                        plist_k = "D2978E837C03D1F3BF7E3D947E7E7E92";
+                        plist_k = "C9CF917ECE19F3337DAB767BFFD80E63";
                         break;
                     case "21":
                         plist_k = "32AD3597A3E87A106579938F58652FD8";
@@ -477,26 +515,7 @@
                         break;
                 }           
             }
-
-            //取得da值
-            var plist_da = window.btoa(acc)
-
-            return "?site="+site+"&k="+plist_k+"&da="+plist_da
-        }
-
-        function downloadPlist(account, site, version, domain, type) {
-            // 替換成實際的 plist 生成頁面 URL
-            const dynamicPlistURL = `https://dynamic-plist.onrender.com/generatePlist?account=${account}&site=${site}&version=${version}&domain=${domain}&type=${type}`;
-
-            // 創建包含 itms-services 的按鈕
-            const installButton = document.createElement("a");
-            installButton.href = `itms-services://?action=download-manifest&amp;url=itms-services://?action=download-manifest&amp;url=${encodeURIComponent(dynamicPlistURL)}`;
-            installButton.textContent = "Install App";
-            document.body.appendChild(installButton);
-
-            installButton.click();
-            // Remove the link from the body
-            document.body.removeChild(installButton);
+            return plist_k
         }
     </script>
 
